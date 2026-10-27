@@ -2,19 +2,17 @@ import NextAuth, { DefaultSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
 
-// Example user database (replace with your own database calls)
+// Admin accounts come from env vars (see .env.example); passwords are bcrypt hashes
 const users = [
   {
     id: "1",
-    username: "soham",
-    // password: "$2b$10$H.s7Bz.VB0Gr5XkzUz3W9eM0v5gMVrZeyF.2FmnK.l2SNz.KqO4yu" // bcrypt hashed password
-    password: "untrained0"
+    username: process.env.ADMIN_1_USERNAME,
+    password: process.env.ADMIN_1_PASSWORD_HASH
   },
   {
     id: "2",
-    username: "atharva",
-    // password: "$2b$10$H.s7Bz.VB0Gr5XkzUz3W9eM0v5gMVrZeyF.2FmnK.l2SNz.KqO4yu" // bcrypt hashed password
-    password: "untrained0"
+    username: process.env.ADMIN_2_USERNAME,
+    password: process.env.ADMIN_2_PASSWORD_HASH
   }
 ];
 
@@ -45,9 +43,9 @@ export const authOptions: NextAuthOptions = {
         const user = users.find((user) => user.username === username);
 
         // If user doesn't exist or password doesn't match
-        // if (!user || !(await compare(password, user.password))) {
-        //   throw new Error("Invalid username or password");
-        // }
+        if (!user?.password || !(await compare(password, user.password))) {
+          throw new Error("Invalid username or password");
+        }
 
         // Return user object (without password) if authentication is successful
         return {

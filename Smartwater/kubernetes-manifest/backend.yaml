@@ -1,3 +1,5 @@
+# DATABASE_URL comes from a Kubernetes Secret. Create it before applying this manifest:
+#   kubectl create secret generic nestjs-backend-secrets --from-literal=DATABASE_URL='mongodb+srv://USER:PASSWORD@HOST/SmartWater'
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,7 +25,10 @@ spec:
         - name: AWS_S3_REGION
           value: "us-east-1"
         - name: DATABASE_URL
-          value: "mongodb+srv://<username>:<password>@cluster0.xck24.mongodb.net/SmartWater?retryWrites=true&w=majority&&ssl=true&appName=Cluster0"
+          valueFrom:
+            secretKeyRef:
+              name: nestjs-backend-secrets
+              key: DATABASE_URL
         ports:
         - containerPort: 3000
 ---
